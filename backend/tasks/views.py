@@ -30,15 +30,24 @@ class TaskViewSet(viewsets.ModelViewSet):
             status='completed',
             updated_at__date=today
         )
-        overloaded = active.count() > 10
+
+        active_count = active.count()
+
+        if active_count < 5:
+            mental_state = 'balanced'
+        elif active_count < 10:
+            mental_state = 'busy'
+        else:
+            mental_state = 'overloaded'
 
         top_tasks = active.order_by('-final_score')[:5]
         serializer = self.get_serializer(top_tasks, many=True)
 
         return Response({
             'date': today,
-            'active_tasks': active.count(),
+            'active_tasks': active_count,
             'completed_today': completed_today.count(),
-            'overloaded': overloaded,
+            'overloaded': active_count >= 10,
+            'mental_state': mental_state,
             'top_priority_tasks': serializer.data,
         })
