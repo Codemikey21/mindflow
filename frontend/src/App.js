@@ -7,7 +7,6 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Decisions from './pages/Decisions';
-import './App.css';
 
 function App() {
     return (
