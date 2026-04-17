@@ -1,70 +1,205 @@
-# Getting Started with Create React App
+<div align="center">
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# 🧠 MindFlow
 
-## Available Scripts
+### Plataforma Inteligente de Organización Personal y Decisiones
 
-In the project directory, you can run:
+[![Django](https://img.shields.io/badge/Django-5.2-092E20?style=for-the-badge&logo=django&logoColor=white)](https://djangoproject.com)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
+[![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
+[![Swagger](https://img.shields.io/badge/Swagger-Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](http://localhost:8000/api/docs)
 
-### `npm start`
+> **MindFlow** reduce la sobrecarga mental mediante priorización automática de tareas y un motor inteligente de decisiones. No es un CRUD simple — organiza, analiza, prioriza y recomienda.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+</div>
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## ✨ Funcionalidades principales
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| Módulo | Descripción |
+|--------|-------------|
+| 🔐 **Autenticación** | Registro, login con JWT, protección de rutas |
+| 📋 **Gestión de Tareas** | CRUD con priorización automática por urgencia e importancia |
+| ⚡ **Algoritmo de Scoring** | Clasifica tareas dinámicamente con score final |
+| 🧠 **Motor de Decisiones** | Evalúa opciones por peso, impacto y riesgo |
+| 📊 **Dashboard Inteligente** | Resumen diario, alertas y actividad reciente |
+| 🤖 **Avatar Asistente** | Tips contextuales por sección |
+| 📡 **Swagger UI** | Documentación completa en `/api/docs/` |
+| ✅ **Tests Unitarios** | 7 tests cubriendo auth, tasks y decisions |
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🏗️ Arquitectura
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+mindflow/
+├── backend/                  # Django REST API
+│   ├── authentication/       # Registro, login, JWT
+│   ├── tasks/                # CRUD + algoritmo de priorización
+│   ├── decisions/            # Motor de decisiones
+│   └── mindflow_backend/     # Configuración principal
+└── frontend/                 # React SPA
+    └── src/
+        ├── components/       # PrivateRoute, Avatar
+        ├── context/          # AuthContext, TaskContext
+        ├── pages/            # Login, Register, Dashboard, Tasks, Decisions
+        └── services/         # api.js, authService, taskService, decisionService
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 🚀 Instalación y uso
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Requisitos previos
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Python 3.11+
+- Node.js 22+
+- MySQL 8.0+
+- Git
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1️⃣ Clonar el repositorio
 
-## Learn More
+```bash
+git clone https://github.com/Codemikey21/mindflow.git
+cd mindflow
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 2️⃣ Configurar el Backend
 
-### Code Splitting
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Crear la base de datos en MySQL:
 
-### Analyzing the Bundle Size
+```sql
+CREATE DATABASE mindflow_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Configurar credenciales en `backend/mindflow_backend/settings.py`:
 
-### Making a Progressive Web App
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mindflow_db',
+        'USER': 'root',
+        'PASSWORD': 'tu_contraseña',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Ejecutar migraciones e iniciar servidor:
 
-### Advanced Configuration
+```bash
+python manage.py migrate
+python manage.py runserver
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+✅ Backend corriendo en `http://localhost:8000`
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 3️⃣ Configurar el Frontend
 
-### `npm run build` fails to minify
+```bash
+cd frontend
+npm install
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+✅ Frontend corriendo en `http://localhost:3000`
+
+---
+
+## 📡 API Endpoints
+
+### Autenticación
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `POST` | `/api/auth/register/` | Registro de usuario |
+| `POST` | `/api/auth/login/` | Login — retorna JWT |
+| `POST` | `/api/auth/token/refresh/` | Refrescar token |
+| `GET` | `/api/auth/profile/` | Perfil del usuario autenticado |
+
+### Tareas
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/api/tasks/` | Listar todas las tareas |
+| `POST` | `/api/tasks/` | Crear tarea con scoring automático |
+| `PATCH` | `/api/tasks/{id}/` | Actualizar tarea |
+| `DELETE` | `/api/tasks/{id}/` | Eliminar tarea |
+| `GET` | `/api/tasks/prioritized/` | Tareas ordenadas por score |
+| `GET` | `/api/tasks/daily_summary/` | Resumen del día |
+
+### Decisiones
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/api/decisions/` | Listar decisiones |
+| `POST` | `/api/decisions/` | Crear y evaluar decisión |
+| `DELETE` | `/api/decisions/{id}/` | Eliminar decisión |
+
+### Documentación
+| Endpoint | Descripción |
+|----------|-------------|
+| `/api/docs/` | Swagger UI interactivo |
+
+---
+
+## 🧪 Tests
+
+```bash
+cd backend
+python manage.py test
+```
+
+```
+Ran 7 tests in 3.019s
+OK
+```
+
+---
+
+## 🌿 Control de versiones
+
+```
+main
+└── develop
+    ├── feature/project-setup
+    └── feature/frontend-setup
+```
+
+| Commit | Descripción |
+|--------|-------------|
+| `feat: project structure and django apps setup` | Estructura inicial |
+| `feat: django settings configured with MySQL, JWT and CORS` | Configuración Django |
+| `feat: custom user model for authentication app` | Modelo de usuario |
+| `feat: authentication endpoints with JWT login and register` | Auth completa |
+| `feat: tasks app with automatic prioritization algorithm` | App tareas |
+| `feat: decisions app with scoring engine and recommendations` | App decisiones |
+| `feat: unit tests for authentication, tasks and decisions` | Tests unitarios |
+| `feat: frontend complete with React, routing and UI` | Frontend completo |
+
+---
+
+## 👤 Autor
+
+<div align="center">
+
+**Miguel Solano**  
+Estudiante de Ingeniería — Universidad Autónoma de Bucaramanga (UNAB)  
+
+[![GitHub](https://img.shields.io/badge/GitHub-Codemikey21-181717?style=for-the-badge&logo=github)](https://github.com/Codemikey21)
+
+</div>
