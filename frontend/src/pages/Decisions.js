@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import decisionService from '../services/decisionService';
+import Avatar from '../components/Avatar';
 
 const Decisions = () => {
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [decisions, setDecisions] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -14,9 +16,7 @@ const Decisions = () => {
         { name: '', weight: 1, impact: 5, risk: 3 },
     ]);
 
-    useEffect(() => {
-        fetchDecisions();
-    }, []);
+    useEffect(() => { fetchDecisions(); }, []);
 
     const fetchDecisions = async () => {
         setLoading(true);
@@ -29,6 +29,8 @@ const Decisions = () => {
             setLoading(false);
         }
     };
+
+    const handleLogout = () => { logout(); navigate('/login'); };
 
     const addOption = () => {
         setOptions([...options, { name: '', weight: 1, impact: 5, risk: 3 }]);
@@ -61,20 +63,51 @@ const Decisions = () => {
         setDecisions(decisions.filter(d => d.id !== id));
     };
 
-    return (
-        <div className="dashboard-container">
-            <nav className="navbar">
-                <h1 className="logo">MindFlow</h1>
-                <div className="nav-links">
-                    <Link to="/dashboard">Dashboard</Link>
-                    <Link to="/tasks">Tareas</Link>
-                    <button onClick={logout} className="logout-btn">Cerrar Sesión</button>
-                </div>
-            </nav>
+    const getMaxScore = (options) => {
+        return Math.max(...options.map(o => o.final_score), 1);
+    };
 
-            <div className="dashboard-content">
+    const getScorePercentage = (score, maxScore) => {
+        return Math.max((score / maxScore) * 100, 5).toFixed(0);
+    };
+
+    return (
+        <div className="app-layout">
+            <aside className="sidebar">
+                <div className="sidebar-logo">MindFlow</div>
+                <nav className="sidebar-nav">
+                    <Link to="/dashboard" className="sidebar-item">
+                        <span className="icon">🏠</span> Dashboard
+                    </Link>
+                    <Link to="/tasks" className="sidebar-item">
+                        <span className="icon">📋</span> Tareas
+                    </Link>
+                    <Link to="/decisions" className="sidebar-item active">
+                        <span className="icon">🧠</span> Decisiones
+                    </Link>
+                </nav>
+                <div className="sidebar-bottom">
+                    <div className="sidebar-user">
+                        <div className="sidebar-avatar">
+                            {user?.username?.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div className="sidebar-username">{user?.username}</div>
+                            <div className="sidebar-email">{user?.email}</div>
+                        </div>
+                    </div>
+                    <button className="sidebar-item" onClick={handleLogout}>
+                        <span className="icon">🚪</span> Cerrar Sesión
+                    </button>
+                </div>
+            </aside>
+
+            <main className="main-content">
                 <div className="page-header">
-                    <h2>🧠 Motor de Decisiones</h2>
+                    <div>
+                        <h2>🧠 Motor de Decisiones</h2>
+                        <p className="page-subtitle">Evalúa opciones con criterios inteligentes y obtén recomendaciones</p>
+                    </div>
                     <button onClick={() => setShowForm(!showForm)} className="btn-primary">
                         {showForm ? 'Cancelar' : '+ Nueva Decisión'}
                     </button>
@@ -82,46 +115,77 @@ const Decisions = () => {
 
                 {showForm && (
                     <form onSubmit={handleSubmit} className="task-form">
-                        <input type="text" placeholder="Título de la decisión" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} required />
-                        <textarea placeholder="Descripción" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} />
-                        <h3>Opciones</h3>
+                        <input type="text" placeholder="¿Qué decisión necesitas tomar?" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} required />
+                        <textarea placeholder="Describe el contexto de la decisión" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} />
+                        <h3 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Opciones a evaluar</h3>
                         {options.map((opt, i) => (
                             <div key={i} className="option-row">
                                 <input type="text" placeholder={`Opción ${i + 1}`} value={opt.name} onChange={(e) => updateOption(i, 'name', e.target.value)} required />
-                                <label>Peso <input type="number" min="1" max="10" value={opt.weight} onChange={(e) => updateOption(i, 'weight', e.target.value)} /></label>
-                                <label>Impacto <input type="number" min="1" max="10" value={opt.impact} onChange={(e) => updateOption(i, 'impact', e.target.value)} /></label>
-                                <label>Riesgo <input type="number" min="1" max="10" value={opt.risk} onChange={(e) => updateOption(i, 'risk', e.target.value)} /></label>
+                                <label>Peso (1-10)
+                                    <input type="number" min="1" max="10" value={opt.weight} onChange={(e) => updateOption(i, 'weight', e.target.value)} />
+                                </label>
+                                <label>Impacto (1-10)
+                                    <input type="number" min="1" max="10" value={opt.impact} onChange={(e) => updateOption(i, 'impact', e.target.value)} />
+                                </label>
+                                <label>Riesgo (1-10)
+                                    <input type="number" min="1" max="10" value={opt.risk} onChange={(e) => updateOption(i, 'risk', e.target.value)} />
+                                </label>
                             </div>
                         ))}
-                        <button type="button" onClick={addOption} className="btn-secondary">+ Agregar Opción</button>
-                        <button type="submit" className="btn-primary">Evaluar Decisión</button>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button type="button" onClick={addOption} className="btn-secondary">+ Agregar Opción</button>
+                            <button type="submit" className="btn-primary">⚡ Evaluar Decisión</button>
+                        </div>
                     </form>
                 )}
 
-                {loading ? <p>Cargando...</p> : (
+                {loading ? <p style={{ color: 'var(--text-muted)' }}>Cargando...</p> : (
                     <div className="tasks-list">
+                        {decisions.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
+                                <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🤔</div>
+                                <p>No hay decisiones aún. ¡Evalúa tu primera decisión!</p>
+                            </div>
+                        )}
                         {decisions.map(decision => (
                             <div key={decision.id} className="task-card">
                                 <h3>{decision.title}</h3>
-                                <p>{decision.description}</p>
+                                {decision.description && <p>{decision.description}</p>}
+
                                 <div className="recommendation">
-                                    <strong>💡 Recomendación:</strong>
+                                    <strong>💡 Recomendación del sistema</strong>
                                     <p>{decision.recommendation}</p>
                                 </div>
-                                <div className="options-list">
-                                    {decision.options.map(opt => (
-                                        <div key={opt.id} className="option-result">
-                                            <span>{opt.name}</span>
-                                            <span className="score">Score: {opt.final_score}</span>
-                                        </div>
-                                    ))}
+
+                                <div className="options-results">
+                                    {decision.options
+                                        .sort((a, b) => b.final_score - a.final_score)
+                                        .map(opt => {
+                                            const maxScore = getMaxScore(decision.options);
+                                            const pct = getScorePercentage(opt.final_score, maxScore);
+                                            return (
+                                                <div key={opt.id} className="option-result">
+                                                    <div className="option-result-header">
+                                                        <span>{opt.name}</span>
+                                                        <span className="option-score-label">{pct}%</span>
+                                                    </div>
+                                                    <div className="score-bar-container">
+                                                        <div className="score-bar" style={{ width: `${pct}%` }}></div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                 </div>
-                                <button onClick={() => handleDelete(decision.id)} className="btn-danger">Eliminar</button>
+
+                                <button onClick={() => handleDelete(decision.id)} className="btn-danger">
+                                    🗑️ Eliminar
+                                </button>
                             </div>
                         ))}
                     </div>
                 )}
-            </div>
+            </main>
+            <Avatar />
         </div>
     );
 };
